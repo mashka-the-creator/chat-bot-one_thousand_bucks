@@ -1,0 +1,141 @@
+import aiogram
+import asyncio
+import random
+from aiogram import types
+from aiogram import Bot, Dispatcher, F, Router
+from aiogram.filters import Command
+from aiogram.types import Message
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+bot = Bot(token = '7848026392:AAEYDqQdN9urd7d2VOdAbM_gX7W2NWW6egY')
+dp = Dispatcher()
+router = Router()
+
+@router.message(Command('start'))
+async def send_welcome(message: Message):
+    username = message.from_user.first_name
+    await message.answer('привет, ' + username + ', додик несчастный')
+    kb = [
+        [
+            types.KeyboardButton(text='привет, понял(-а)'),
+            types.KeyboardButton(text='пока')
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        # one_time_keyboard=True
+    )
+    await message.answer('этот бот нужен, чтобы ты не рылся в 100500 чатах, а быстро получал материалы по команде /help', reply_markup=keyboard)
+
+
+@router.message(F.text.lower() == 'привет, понял(-а)')
+async def otvet(message: Message):
+    await message.answer('пока')
+
+@router.message(F.text.lower() == 'пока')
+async def otvet(message: Message):
+    await message.answer('напиши /help идиот')
+
+
+@router.message(Command('help'))
+async def send_help(message: Message):
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text = "всн, первый курс",
+        callback_data = "1"
+    ))
+
+    builder.add(types.InlineKeyboardButton(
+        text="я лох",
+    callback_data = "2"
+    ))
+    await message.answer('кто ты?',
+                         reply_markup = builder.as_markup())
+
+
+
+@dp.callback_query(F.data == "2")
+async def send_0(callback: types.CallbackQuery):
+    kb = [
+        [
+            types.KeyboardButton(text='бот говно'),
+            types.KeyboardButton(text='пон, перепоступлю на всн')
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        # one_time_keyboard=True
+    )
+    await callback.message.answer("иди нахуй, для тебя ничего нет", reply_markup=keyboard)
+
+@router.message(F.text.lower() == 'бот говно')
+async def otvet(message: Message):
+    await message.answer("на ваше мнение всем поебать")
+
+@router.message(F.text.lower() == 'пон, перепоступлю на всн')
+async def otvet(message: Message):
+    await message.answer("ну ок, попробуй")
+
+
+
+@dp.callback_query(F.data == "1")
+async def send_1(callback: types.CallbackQuery):
+    kb = [
+        [
+            types.KeyboardButton(text='соц тер'),
+            types.KeyboardButton(text='микра'),
+            types.KeyboardButton(text='python'),
+            types.KeyboardButton(text='линал'),
+            types.KeyboardButton(text='орг'),
+            types.KeyboardButton(text='бжд')
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        # one_time_keyboard=True
+    )
+    await callback.message.answer("какой предмет, первачок?", reply_markup=keyboard)
+
+@router.message(F.text.lower() == 'соц тер')
+async def otvet(message: Message):
+    await message.answer("ридер по ссылке: https://drive.google.com/file/d/18XuWDwiYazhSgbiVKlQL8f_9cQsHNuG3/view?usp=drive_link")
+
+@router.message(F.text.lower() == 'микра')
+async def otvet(message: Message):
+    await message.answer('диск с домашками, учебниками, лекциями, планом семинаров: https://disk.yandex.ru/d/7-eteDAa75nGZA')
+
+
+@router.message(F.text.lower() == 'python')
+async def otvet(message: Message):
+    await message.answer('ведомость: https://docs.google.com/spreadsheets/d/1CIOrRAiYfkrn8_H8aECgg78hbl13VgbOcfAsavfhV2I/edit?gid=960131146#gid=960131146')
+    await message.answer('вики страница: https://bit.ly/3BabfRC')
+
+
+@router.message(F.text.lower() == 'линал')
+async def otvet(message: Message):
+    await message.answer('ведомость: https://docs.google.com/spreadsheets/d/1II8LDr5GyKba6ROQGDz-op16NZkuvXMoJY0R3XNFE4M/edit?gid=1640015785#gid=1640015785')
+    await message.answer('все, что есть на курсе: https://saharnina.yonote.ru/share/0eef274b-47c8-4b55-a5e3-e45bce12d1b3')
+    await message.answer("записи лекций: https://rutube.ru/plst/641837/")
+
+
+@router.message(F.text.lower() == 'орг')
+async def otvet(message: Message):
+    await message.answer('решай тесты: https://edu.hse.ru/')
+    await message.answer('а еще не проеби онлайн экз 28 окт в 9:30')
+
+
+@router.message(F.text.lower() == 'бжд')
+async def otvet(message: Message):
+    await message.answer('домашки сдавай вовремя: https://edu.hse.ru/')
+
+
+
+
+
+async def main():
+    dp.include_router(router)   # связь диспетчера (аккумулирует задачи) и роутера (распределяет задачи)
+    await dp.start_polling(bot)  # начни вопринимать то, что присылается
+
+if __name__ == '__main__':
+    asyncio.run(main())
